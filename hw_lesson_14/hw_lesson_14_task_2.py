@@ -23,7 +23,6 @@ assert create_slogan("Steve") == "Steve drinks * in his brand new *!"
 
 ```
 """
-import re
 
 
 def stop_words(words: list):
