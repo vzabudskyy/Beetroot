@@ -78,7 +78,7 @@ class TVController:
         return self.channels[self.temp_channel]
 
     def is_exist(self, channel):
-        if (type(channel) == int and (channel - 1) < len(self.channels)) or channel in self.channels:
+        if (type(channel) == int and (int(channel) - 1) < len(self.channels)) or channel in self.channels:
             return "Yes"
         else:
             return "No"
