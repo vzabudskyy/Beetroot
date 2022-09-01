@@ -52,7 +52,7 @@ controller.is_exist("BBC") == "Yes"
 class TVController:
     def __init__(self, channels):
         self.channels = channels
-        self.temp_channel = channels[0]
+        self.temp_channel = 0
 
     def first_channel(self):
         self.temp_channel = 0
@@ -89,7 +89,7 @@ if __name__ == "__main__":
     controller = TVController(CHANNELS)
     assert controller.first_channel() == "BBC"
     assert controller.last_channel() == "TV1000"
-    assert controller.turn_channel(1) == "BBC"
+    assert controller.turn_channel(2) == "BBC"
     assert controller.next_channel() == "Discovery"
     assert controller.previous_channel() == "BBC"
     assert controller.current_channel() == "BBC"
