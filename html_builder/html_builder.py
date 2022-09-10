@@ -1,25 +1,37 @@
-"""
-html = HTML(Head -> class, Body -> class)
-body = Body(Div -> class)
-HTML -> те що збирає теги(класи) до купи
+from selenium import webdriver as w
+from time import sleep
+from save_to_file import save
+import os
+from datetime import datetime, timedelta
 
-"""
 
+class HmtlDisplayer:
+    webdrivers_info = {"firefox": {"driver": w.Firefox, "path": "\\browser_drivers\\geckodriver.exe"},
+                       "chrome": {"driver": w.Chrome, "path": "\\browser_drivers\\chromedriver.exe"}
+                       }
+    driver = None
 
-"""
-html = HTML(Head -> class, Body -> class)
-body = Body(Div -> class)
-HTML -> те що збирає теги(класи) до купи
+    def __init__(self, bw_name):
+        self.bw_name = bw_name
+        os.environ["PATH"] += os.pathsep + os.getcwd() + self.webdrivers_info[bw_name]["path"]
+        self.driver = self.webdrivers_info[bw_name]["driver"](executable_path=self.webdrivers_info[bw_name]["path"][1:])
 
-"""
+    def open(self, url):
+        self.driver.get(url)
+
+    def refresh(self):
+        self.driver.refresh()
 
 
 class Tag:
-    def __init__(self, tag_name, content=None, attr=None):
-        self.tag_name = tag_name
+    _tag_name = "tag"
+    _type = "Double"
+
+    def __init__(self, content=None, attr=None):
         self.content = content
         self.attr = attr
 
+    @save("index.html")
     def __str__(self):
         if type(self.content) == list:
             content = '\n'
@@ -33,32 +45,84 @@ class Tag:
         else:
             attr = ""
         content = str(content).replace('\n', '\n\t')
-        return f"<{self.tag_name} {attr}>\n\t{content}\n</{self.tag_name}>"
+        if self._type == "Double":
+            return f"<{self._tag_name} {attr}>\n\t{content}\n</{self._tag_name}>"
+        else:
+            return f"<{self._tag_name} {attr}>"
 
 
 class Div(Tag):
-    def __init__(self, content, attr=None):
-        super().__init__("div", content, attr)
+    _tag_name = "div"
 
 
 class P(Tag):
-    def __init__(self, content, attr=None):
-        super().__init__("p", content, attr)
+    _tag_name = "p"
+
+
+class H1(Tag):
+    _tag_name = "h1"
+
+
+class Link(Tag):
+    _type = "Once"
+    _tag_name = "link"
 
 
 class Html(Tag):
-    def __init__(self, content, attr=None):
-        super().__init__("html", content, attr)
+    _tag_name = "html"
 
     def __str__(self):
         return f"<!DOCTYPE html>\n{Tag.__str__(self)}"
 
 
+class Head(Tag):
+    _tag_name = "head"
+
+
+class Body(Tag):
+    _tag_name = "body"
+
+
+class Timer:
+    def __init__(self, time):
+        self.anchor_time = None
+        self.time = datetime.strptime(time, "%H:%M:%S")
+
+    def __call__(self):
+        delta = self.time - (datetime.now() - self.anchor_time) + timedelta(microseconds=100000)
+        return delta.strftime("%H:%M:%S")
+
+    def start(self):
+        self.anchor_time = datetime.now() + timedelta(microseconds=30000)
+
+
 if __name__ == "__main__":
-    tag = Html(Div([Div(P("First")), P('Frtrtr'), P('Frtrtr')]))
-    print(tag)
-    tag = Html(
-        [Div(['First', P('Paragraph')], {'class': 'jss5 jss6'}),
-         P('Hello world')]
-    )
-    print(tag)
+    t = Timer("00:00:20")
+    screen = HmtlDisplayer("chrome")
+    page = Html([
+                Head(
+                        Link(attr={"rel": "stylesheet", "href": "\"mystyle.css\""})
+                    ),
+                Body([
+                        Div("TIMER"),
+                        H1("########")
+                    ])
+                ])
+    print(page)
+    screen.open("C:\\Users\\Vladislav\\PycharmProjects\\BeetrootAcademy\\html_builder\\index.html")
+    t.start()
+    while t() != "00:00:00":
+        sleep(1)
+        t_time = t()
+        page = Html([
+            Head(
+                Link(attr={"rel": "stylesheet", "href": "\"mystyle.css\""})
+            ),
+            Body([
+                Div("TIMER"),
+                H1(t_time)
+            ])
+        ])
+        print(page)
+        screen.refresh()
+
