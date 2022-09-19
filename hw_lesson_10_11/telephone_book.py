@@ -46,6 +46,17 @@ def create_phonebook(name):
         json.dump({"people": []}, file)
 
 
+def load_book(name):
+    with open(f"phonebooks\\{name}.json", "r") as file:
+        phonebook = json.load(file)
+        return phonebook
+
+
+def save_book(name, phonebook):
+    with open(f"phonebooks\\{name}.json", "w") as file:
+        json.dump(phonebook, file)
+
+
 def get_new_contact_info():
     first_name = input("Enter first name: ")
     last_name = input("Enter last name: ")
@@ -63,53 +74,36 @@ def get_new_contact_info():
     return contact
 
 
-def create_new_contact(phonebook_name, contact):
-    with open(f"phonebooks/{phonebook_name}.json", "r+") as file:
-        phonebook = json.load(file)
-        file.seek(0)
-        file.truncate(0)
-        if contact not in phonebook["people"]:
-            phonebook["people"].append(contact)
-            json.dump(phonebook, file)
-        else:
-            return 0
+def write_new_contact(phonebook_name, contact):
+    phonebook = load_book(phonebook_name)
+    if contact not in phonebook["people"]:
+        phonebook["people"].append(contact)
+        save_book(phonebook_name, phonebook)
 
 
 def search(key, phonebook_name):
-    with open(f"phonebooks/{phonebook_name}.json", "r") as file:
-        file_read = file.read()
-        phonebook = json.loads(file_read)
-        for i in phonebook["people"]:
-            if key in i.values():
-                return i
-            else:
-                pass
+    phonebook = load_book(phonebook_name)
+    for i in phonebook["people"]:
+        if key in i.values():
+            return i
 
 
 def delete_record(phone_number, phonebook_name):
-    with open(f"phonebooks/{phonebook_name}.json", "r+") as file:
-        file_read = file.read()
-        phonebook = json.loads(file_read)
-        file.seek(0)
-        file.truncate(0)
-        for i in phonebook["people"]:
-            if phone_number in i.values():
-                phonebook["people"].remove(i)
-                json.dump(phonebook, file)
+    phonebook = load_book(phonebook_name)
+    for i in phonebook["people"]:
+        if phone_number in i.values():
+            phonebook["people"].remove(i)
+            save_book(phonebook_name, phonebook)
 
 
 def update_record(phone_number, updated_contact, user_phonebook):
-    with open(f"phonebooks/{user_phonebook}.json", "r+") as file:
-        file_read = file.read()
-        phonebook = json.loads(file_read)
-        file.seek(0)
-        file.truncate(0)
-        for i in range(len(phonebook["people"])):
-            if phone_number in phonebook["people"][i].values():
-                updated_contact["phone_number"] = phonebook["people"][i]["phone_number"]
-                phonebook["people"][i] = updated_contact
-                json.dump(phonebook, file)
-                return
+    phonebook = load_book(user_phonebook)
+    for i in range(len(phonebook["people"])):
+        if phone_number in phonebook["people"][i].values():
+            updated_contact["phone_number"] = phonebook["people"][i]["phone_number"]
+            phonebook["people"][i] = updated_contact
+            save_book(user_phonebook, phonebook)
+            return
 
 
 def main():
@@ -123,7 +117,7 @@ def main():
             pprint(result)
         elif user_input == "1":
             new_contact = get_new_contact_info()
-            create_new_contact(user_phonebook, new_contact)
+            write_new_contact(user_phonebook, new_contact)
         elif user_input == "2":
             contact_number = input("Enter phone number: ")
             updated_contact_info = get_new_contact_info()
