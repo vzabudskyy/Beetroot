@@ -1,6 +1,5 @@
 from selenium import webdriver as w
 from time import sleep
-from save_to_file import save
 import os
 from datetime import datetime, timedelta
 
@@ -9,7 +8,6 @@ class HmtlDisplayer:
     webdrivers_info = {"firefox": {"driver": w.Firefox, "path": "\\browser_drivers\\geckodriver.exe"},
                        "chrome": {"driver": w.Chrome, "path": "\\browser_drivers\\chromedriver.exe"}
                        }
-    driver = None
 
     def __init__(self, bw_name):
         self.bw_name = bw_name
@@ -31,7 +29,10 @@ class Tag:
         self.content = content
         self.attr = attr
 
-    @save("index.html")
+    def save(self, name):
+        with open(f"{name}", "w") as file:
+            file.write(self.__str__())
+
     def __str__(self):
         if type(self.content) == list:
             content = '\n'
@@ -108,7 +109,7 @@ if __name__ == "__main__":
                         H1("########")
                     ])
                 ])
-    print(page)
+    page.save("index.html")
     screen.open("C:\\Users\\Vladislav\\PycharmProjects\\BeetrootAcademy\\html_builder\\index.html")
     t.start()
     while t() != "00:00:00":
@@ -123,6 +124,6 @@ if __name__ == "__main__":
                 H1(t_time)
             ])
         ])
-        print(page)
+        page.save("index.html")
         screen.refresh()
 
