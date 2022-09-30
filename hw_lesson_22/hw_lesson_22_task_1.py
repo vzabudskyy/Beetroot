@@ -77,6 +77,7 @@ def search(key: str, phonebook_name: str) -> Union[Dict[str, str], None]:
     for i in phonebook["people"]:
         if key in i.values():
             return i
+    return None
 
 
 def delete_record(phone_number: str, phonebook_name: str) -> None:
