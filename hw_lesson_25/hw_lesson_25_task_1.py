@@ -11,6 +11,13 @@ class Vertex:
     def add_neighbour(self, new_newigbour: 'Vertex'):
         self._neighbours.add(new_newigbour)
 
+    def unmark(self):
+        self._marked = False
+
+    @property
+    def neighbours(self):
+        return self._neighbours
+
     def is_marked(self):
         return self._marked
 
@@ -18,13 +25,15 @@ class Vertex:
         self._marked = True
 
     def __iter__(self):
-        return iter(self._neighbours)
+        return iter(self.neighbours)
 
     def __repr__(self):
         return self.__str__()
 
     def __str__(self):
         return f'Vertex "{self.name}"'
+
+
 
 
 class Graph:
@@ -37,15 +46,17 @@ class Graph:
                 current_vertex.add_neighbour(self._vertices[neighbour])
 
     def depth_search(self, start: str, finish: str):
-        finish_vertex = self._vertices[finish]
         start_vertex = self._vertices[start]
         start_vertex.mark()
-        print(f"{start_vertex}: {start_vertex.path}")
         start_vertex.path.append(start_vertex)
+        if start == finish:
+            return start_vertex.path
         for neighbor in start_vertex:
             if not neighbor.is_marked():
                 neighbor.path = start_vertex.path.copy()
-                self.depth_search(neighbor.name, finish)
+                path = self.depth_search(neighbor.name, finish)
+                if path:
+                    return path
 
     def breadth_search(self, start: str, finish: str) -> List[Vertex]:
         finish_vertex = self._vertices[finish]
@@ -99,6 +110,7 @@ edges2 = {'1': ['2', '3', '4'],
 
 if __name__ == "__main__":
     graph = Graph(edges2)
-    graph.depth_search('1', '6')
-    for i in enumerate(graph._vertices.values(),1):
-        print(i[0], i[1].path)
+    print(graph.depth_search('1', '8'))
+    for i in graph._vertices.values():
+        i.unmark()
+    print(graph.breadth_search('1', '8'))
