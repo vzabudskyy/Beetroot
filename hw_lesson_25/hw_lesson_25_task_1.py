@@ -3,6 +3,7 @@ class Vertex:
         self.name = name
         self._neighbours = set()
         self._marked: bool = False
+        self.path = None
 
     def add_neighbour(self, new_newigbour: 'Vertex'):
         self._neighbours.add(new_newigbour)
@@ -20,14 +21,12 @@ class Vertex:
         return self.__str__()
 
     def __str__(self):
-        return f'Vertex {self.name} with neighbours ' \
-               f'{[n.name for n in self._neighbours]}'
+        return f'Vertex "{self.name}"'
 
 
 class Graph:
     def __init__(self, edges):
-        vertices_names = ['1', '2', '3', '4', '5', '6', '7', '8']
-        self._vertices = {name: Vertex(name) for name in vertices_names}
+        self._vertices = {name: Vertex(name) for name in edges.keys()}
 
         for name, neighbours in edges.items():
             current_vertex = self._vertices[name]
@@ -48,21 +47,33 @@ class Graph:
                     for way in all_ways:
                         if way[-1] == vertex.name:
                             way_to_neighbor = way + neighbour.name
-                            if len(way_to_neighbor) <= 2:
-                                current_ways.append(way_to_neighbor)
-                            elif len(way_to_neighbor) >= 3 and way_to_neighbor[-1] != way_to_neighbor[-3]:
-                                current_ways.append(way_to_neighbor)
                     all_ways = all_ways + current_ways
                     if neighbour.is_marked():
                         continue
                     neighbours.append(neighbour)
 
             level_vertexes = neighbours
-        result = None
-        for path in all_ways:
-            if path[-1] == finish and (result is None or len(path) < len(result)):
-                result = path
-        return result
+        print(all_ways)
+
+    def find_shortest_way2(self, start, finish: str):
+        # finish_vertex = self._vertices[finish]
+        all_ways = [[self._vertices[start]]]
+        level_vertexes = [self._vertices[start]]
+        while level_vertexes:
+            vertex = level_vertexes.pop(0)
+            vertex.mark()
+            current_ways = []
+            for neightbor in vertex:
+                if neightbor.is_marked():
+                    continue
+                level_vertexes.append(neightbor)
+                for way in all_ways:
+                    if way[-1] == vertex:
+                        way_to_neighbor = [i for i in way] + [neightbor]
+                        current_ways.append(way_to_neighbor)
+            all_ways = all_ways + current_ways
+        for i in all_ways:
+            print(f"{i}\n")
 
     def __str__(self):
         return '\n'.join([str(vertex) for vertex in self._vertices.values()])
@@ -77,7 +88,22 @@ edges = {'1': ['2', '3', '4'],
                 '7': ['4'],
                 '8': ['4']}
 
+edges2 = {'1': ['2', '3', '4'],
+          '2': ['1', '5', '6'],
+          '3': ['1'],
+          '4': ['1', '7', '8'],
+          '5': ['2', '9', '10'],
+          '6': ['2', '14'],
+          '7': ['4', '13', '11', '12'],
+          '8': ['4'],
+          '9': ['5'],
+          '10': ['5'],
+          '11': ['7'],
+          '12': ['7'],
+          '13': ['7', '14'],
+          '14': ['6', '13']}
 
-graph = Graph(edges)
-print(graph)
-print(graph.find_shortest_way('1', '6'))
+
+if __name__ == "__main__":
+    graph = Graph(edges2)
+    print(graph.find_shortest_way2('1', '6'))
