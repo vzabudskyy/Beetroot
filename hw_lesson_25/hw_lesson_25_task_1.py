@@ -1,9 +1,12 @@
+from typing import List
+
+
 class Vertex:
     def __init__(self, name):
         self.name = name
         self._neighbours = set()
         self._marked: bool = False
-        self.path = None
+        self.path = []
 
     def add_neighbour(self, new_newigbour: 'Vertex'):
         self._neighbours.add(new_newigbour)
@@ -33,30 +36,19 @@ class Graph:
             for neighbour in neighbours:
                 current_vertex.add_neighbour(self._vertices[neighbour])
 
-    def find_shortest_way(self, start: str, finish: str):
-        all_ways = [start]
-        start_vertex = self._vertices[start]
+    def depth_search(self, start: str, finish: str):
         finish_vertex = self._vertices[finish]
-        level_vertexes = [start_vertex]
-        while level_vertexes:
-            neighbours = []
-            for vertex in level_vertexes:
-                vertex.mark()
-                for neighbour in vertex:
-                    current_ways = []
-                    for way in all_ways:
-                        if way[-1] == vertex.name:
-                            way_to_neighbor = way + neighbour.name
-                    all_ways = all_ways + current_ways
-                    if neighbour.is_marked():
-                        continue
-                    neighbours.append(neighbour)
+        start_vertex = self._vertices[start]
+        start_vertex.mark()
+        print(f"{start_vertex}: {start_vertex.path}")
+        start_vertex.path.append(start_vertex)
+        for neighbor in start_vertex:
+            if not neighbor.is_marked():
+                neighbor.path = start_vertex.path.copy()
+                self.depth_search(neighbor.name, finish)
 
-            level_vertexes = neighbours
-        print(all_ways)
-
-    def find_shortest_way2(self, start, finish: str):
-        # finish_vertex = self._vertices[finish]
+    def breadth_search(self, start: str, finish: str) -> List[Vertex]:
+        finish_vertex = self._vertices[finish]
         all_ways = [[self._vertices[start]]]
         level_vertexes = [self._vertices[start]]
         while level_vertexes:
@@ -69,11 +61,12 @@ class Graph:
                 level_vertexes.append(neightbor)
                 for way in all_ways:
                     if way[-1] == vertex:
-                        way_to_neighbor = [i for i in way] + [neightbor]
+                        way_to_neighbor = way.copy() + [neightbor]
+                        if neightbor == finish_vertex:
+                            return way_to_neighbor
                         current_ways.append(way_to_neighbor)
             all_ways = all_ways + current_ways
-        for i in all_ways:
-            print(f"{i}\n")
+        return all_ways
 
     def __str__(self):
         return '\n'.join([str(vertex) for vertex in self._vertices.values()])
@@ -106,4 +99,6 @@ edges2 = {'1': ['2', '3', '4'],
 
 if __name__ == "__main__":
     graph = Graph(edges2)
-    print(graph.find_shortest_way2('1', '6'))
+    graph.depth_search('1', '6')
+    for i in enumerate(graph._vertices.values(),1):
+        print(i[0], i[1].path)
