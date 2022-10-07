@@ -45,6 +45,11 @@ class Graph:
             for neighbour in neighbours:
                 current_vertex.add_neighbour(self._vertices[neighbour])
 
+    def unmark(self):
+        if all(vertex.is_marked() for vertex in self._vertices.values()):
+            for vertex in self._vertices:
+                vertex.unmark()
+
     def depth_search(self, start: str, finish: str):
         start_vertex = self._vertices[start]
         start_vertex.mark()
@@ -56,6 +61,8 @@ class Graph:
                 neighbor.path = start_vertex.path.copy()
                 path = self.depth_search(neighbor.name, finish)
                 if path:
+                    for vertex in self._vertices.values():
+                        vertex.unmark()
                     return path
 
     def breadth_search(self, start: str, finish: str) -> List[Vertex]:
@@ -74,9 +81,13 @@ class Graph:
                     if way[-1] == vertex:
                         way_to_neighbor = way.copy() + [neightbor]
                         if neightbor == finish_vertex:
+                            for vertex in self._vertices.values():
+                                vertex.unmark()
                             return way_to_neighbor
                         current_ways.append(way_to_neighbor)
             all_ways = all_ways + current_ways
+        for vertex in self._vertices.values():
+            vertex.unmark()
         return all_ways
 
     def __str__(self):
@@ -111,6 +122,4 @@ edges2 = {'1': ['2', '3', '4'],
 if __name__ == "__main__":
     graph = Graph(edges2)
     print(graph.depth_search('1', '8'))
-    for i in graph._vertices.values():
-        i.unmark()
     print(graph.breadth_search('1', '8'))
