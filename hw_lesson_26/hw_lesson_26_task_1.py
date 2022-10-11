@@ -31,9 +31,6 @@ class OrderedList:
             new_head.set_next(self._head)
             self._head = new_head
             return
-        elif index == self.size() - 1:
-            self.append(data)
-            return
 
         node = self._head
         for _ in range(index - 1):
@@ -52,16 +49,12 @@ class OrderedList:
         node = self._head
         while node.get_next() is not None:
             node = node.get_next()
-        if isinstance(new_node, Node):
-            node.set_next(new_node)
-            return
         node.set_next(Node(new_node))
 
     def pop(self, index=None):
-        if not index:
+        if not index and self.size() != 1:
             index = self.size() - 1
-
-        if self.size() == 1:
+        elif self.size() == 1:
             result = self._head
             self._head = None
             return result
@@ -121,10 +114,9 @@ class OrderedList:
 
     def __getitem__(self, index):
         if isinstance(index, slice):
-            indexes = [i for i in [index.start, index.stop, index.step] if i is not None]
-            if len(indexes) > 2:
+            if index.step is not None:
                 raise ValueError
-            statement = range(indexes[0], indexes[1])
+            statement = range(index.start, index.stop)
             result = OrderedList()
         else:
             statement = range(index)
