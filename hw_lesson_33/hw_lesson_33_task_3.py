@@ -35,7 +35,7 @@ ddcit = {'base': 'stations',
 
 class WeatherApp:
     def __init__(self):
-        self.__api = "dfe60b1bcb6bc9a7fcee386d50120eca"
+        self.__api = "YOUR_API_KEY"
         self.__forecast = None
 
     @staticmethod
