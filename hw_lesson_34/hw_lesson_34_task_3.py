@@ -19,10 +19,11 @@ def check_execution_time(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         start = datetime.now()
-        func(*args, **kwargs)
+        result = func(*args, **kwargs)
         end = datetime.now()
         delta = end - start
         print(f"{func.__name__} was executed in {delta}")
+        return result
     return wrapper
 
 
