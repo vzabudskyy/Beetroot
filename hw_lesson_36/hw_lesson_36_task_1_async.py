@@ -12,10 +12,10 @@ ime the execution of both realizations, explore the results, what realization is
 why did you get a result like this.
 """
 import asyncio
-from hw_lesson_34.hw_lesson_34_task_3 import check_execution_time
+import time
 
 
-async def fib(n):
+def fib(n):
     n1 = 0
     n2 = 1
     if n <= 0:
@@ -29,29 +29,28 @@ async def fib(n):
     return n2
 
 
-async def fac(n):
+def fac(n):
     result = n
-    for _ in range(n-1, 1, -1):
+    for _ in range(n - 1, 1, -1):
         n -= 1
         result *= n
     return result
 
 
-async def sqr(n):
-    return n**2
+def sqr(n):
+    return n ** 2
 
 
-async def cbc(n):
+def cbc(n):
     return n ** 3
 
 
 async def fill_list(func, input_list, output_list):
     for elem in input_list:
-        result = await func(elem)
+        result = func(elem)
         output_list.append(result)
 
 
-@check_execution_time
 async def main(input_list, output_dict):
     await asyncio.gather(fill_list(fib, input_list, output_dict["Fibonacci"]),
                          fill_list(fac, input_list, output_dict["Factorial"]),
@@ -65,7 +64,6 @@ if __name__ == "__main__":
            "Squares": [],
            "Cubics": []}
 
-    nums = [i for i in range(1, 201)]
-
+    nums = [i for i in range(1, 1001)]
     asyncio.run(main(nums, out))
-
+    print(f"Program was executed {time.process_time()}")

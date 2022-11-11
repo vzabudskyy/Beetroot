@@ -11,8 +11,8 @@ Rewrite the code to use simple functions to get the same results but using a mul
 ime the execution of both realizations, explore the results, what realization is more effective,
 why did you get a result like this.
 """
-from hw_lesson_34.hw_lesson_34_task_3 import check_execution_time
 from concurrent.futures import ProcessPoolExecutor
+import time
 
 
 def fib(n):
@@ -45,29 +45,24 @@ def cbc(n):
     return n ** 3
 
 
-def fill_list(func, input_list, output_list):
-    for elem in input_list:
-        result = func(elem)
-        output_list.append(result)
+def fill_list(func, input_list):
+    return [func(elem) for elem in input_list]
 
 
-@check_execution_time
-def main(input_list, output_dict):
-    with ProcessPoolExecutor(max_workers=4) as executor:
-        executor.submit(fill_list, fib, input_list, output_dict["Fibonacci"],
-                        fill_list, fac, input_list, output_dict["Factorial"],
-                        fill_list, sqr, input_list, output_dict["Squares"],
-                        fill_list, cbc, input_list, output_dict["Cubics"])
+def main(input_list):
+    with ProcessPoolExecutor(max_workers=2) as executor:
+        fib_task = executor.submit(fill_list, fib, input_list)
+        fac_task = executor.submit(fill_list, fac, input_list)
+        sqr_task = executor.submit(fill_list, sqr, input_list)
+        cbc_task = executor.submit(fill_list, cbc, input_list)
+        return {"Fibonacci": fib_task.result(),
+                "Factorial": fac_task.result(),
+                "Squares": sqr_task.result(),
+                "Cubics": cbc_task.result()}
 
 
 if __name__ == "__main__":
-    out = {"Fibonacci": [],
-           "Factorial": [],
-           "Squares": [],
-           "Cubics": []}
-
-    nums = [i for i in range(1, 201)]
-
-    main(nums, out)
-
+    nums = [i for i in range(1, 1001)]
+    main(nums)
+    print(f"Program was executed {time.process_time()}")
     

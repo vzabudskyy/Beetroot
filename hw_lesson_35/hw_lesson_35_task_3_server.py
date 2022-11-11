@@ -9,7 +9,7 @@ import socket
 from concurrent.futures import ProcessPoolExecutor
 
 
-class ThreadServer:
+class ProcessServer:
     def __init__(self, port, host):
         self._port = port
         self._host = host
@@ -32,9 +32,10 @@ class ThreadServer:
             with ProcessPoolExecutor() as executor:
                 while True:
                     conn, addr = s.accept()
-                    self.__clients.append(executor.submit(self.serve_client, conn, addr))
+                    self.__clients.append(conn)
+                    executor.submit(self.serve_client, conn, addr)
                     print(f"Connected from [{addr}]")
 
 
 if __name__ == "__main__":
-    ThreadServer(32332, "127.0.0.1").run()
+    ProcessServer(32332, "127.0.0.1").run()

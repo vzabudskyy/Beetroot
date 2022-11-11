@@ -32,7 +32,8 @@ class ThreadServer:
             with ThreadPoolExecutor() as executor:
                 while True:
                     conn, addr = s.accept()
-                    self.__clients.append(executor.submit(self.serve_client, conn, addr))
+                    self.__clients.append(conn)
+                    executor.submit(self.serve_client, conn, addr)
                     print(f"Connected from [{addr}]")
 
 
